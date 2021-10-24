@@ -2,6 +2,7 @@
 
 > 🪞 Formatter JSON delightfully.
 
+[![CI](https://github.com/luin/SwiftJSONFormatter/actions/workflows/main.yml/badge.svg)](https://github.com/luin/SwiftJSONFormatter/actions/workflows/main.yml)
 
 ## Highlights
 
