@@ -1,7 +1,7 @@
+import Foundation
+
 public struct SwiftJSONFormatter {
-  public private(set) var text = "Hello, World!"
-  
-  private static func format(_ value: String, indent: String, newLine: String, separator: String) -> String {
+  private static func format(_ value: String, indent: String, newLine: String, separator: String, unescapeUnicodeSequence: Bool) -> String {
     var formatted = ""
     
     let chars = ArrayIterator(Array(value))
@@ -27,7 +27,7 @@ public struct SwiftJSONFormatter {
           formatted.append(newLine)
           formatted += "\(String(repeating: indent, count: indentLevel))\(char)"
         case "\"":
-          let string = consumeString(chars)
+          let string = consumeString(chars, unescapeUnicodeSequence: unescapeUnicodeSequence)
           formatted.append(string)
         case ",":
           consumeWhitespaces(chars)
@@ -52,12 +52,12 @@ public struct SwiftJSONFormatter {
     return formatted
   }
   
-  public static func beautify(_ value: String, indent: String = "  ") -> String {
-    format(value, indent: indent, newLine: "\n", separator: " ")
+  public static func beautify(_ value: String, indent: String = "  ", unescapeUnicodeSequence: Bool = false) -> String {
+    format(value, indent: indent, newLine: "\n", separator: " ", unescapeUnicodeSequence: unescapeUnicodeSequence)
   }
   
-  public static func minify(_ value: String) -> String {
-    format(value, indent: "", newLine: "", separator: "")
+  public static func minify(_ value: String, unescapeUnicodeSequence: Bool = false) -> String {
+    format(value, indent: "", newLine: "", separator: "", unescapeUnicodeSequence: unescapeUnicodeSequence)
   }
   
   private static func consumeWhitespaces(_ iter: ArrayIterator<String.Element>) {
@@ -70,7 +70,22 @@ public struct SwiftJSONFormatter {
     }
   }
   
-  private static func consumeString(_ iter: ArrayIterator<String.Element>) -> String {
+  private static func performUnescaping(_ jsonString: String, unescapeUnicodeSequence: Bool) -> String {
+    if unescapeUnicodeSequence {
+      let decoder = JSONDecoder()
+      if let data = jsonString.data(using: .utf8), let result = try? decoder.decode(String.self, from: data) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .withoutEscapingSlashes
+        if let encoded = try? encoder.encode(result), let encodedString = String(data: encoded, encoding: .utf8) {
+          return encodedString
+        }
+      }
+    }
+
+    return jsonString
+  }
+  
+  private static func consumeString(_ iter: ArrayIterator<String.Element>, unescapeUnicodeSequence: Bool) -> String {
     var string = "\""
     var escaping = false
     while true {
@@ -88,13 +103,14 @@ public struct SwiftJSONFormatter {
             escaping = true
           }
           if char == "\"" {
-            return string
+            return performUnescaping(string, unescapeUnicodeSequence: unescapeUnicodeSequence)
           }
         }
       } else {
         break
       }
     }
-    return string
+    
+    return performUnescaping(string, unescapeUnicodeSequence: unescapeUnicodeSequence)
   }
 }

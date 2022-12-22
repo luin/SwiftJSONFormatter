@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftJSONFormatter",
     platforms: [
-      .macOS(.v10_13),
+      .macOS(.v10_15),
       .iOS(.v12),
       .tvOS(.v12),
       .watchOS(.v5)

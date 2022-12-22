@@ -19,9 +19,9 @@ class ArrayIterator<T> {
     self.array = array
   }
 
-  func peekNext() -> T? {
-    if head + 1 < array.count {
-      return array[head + 1]
+  func peekNext(n: Int = 1) -> T? {
+    if head + n < array.count {
+      return array[head + n]
     }
     return nil
   }
