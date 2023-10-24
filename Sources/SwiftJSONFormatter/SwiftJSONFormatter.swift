@@ -75,7 +75,9 @@ public struct SwiftJSONFormatter {
       let decoder = JSONDecoder()
       if let data = jsonString.data(using: .utf8), let result = try? decoder.decode(String.self, from: data) {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
+        if #available(iOS 13, tvOS 13, watchOS 6, *) {
+          encoder.outputFormatting = .withoutEscapingSlashes
+        }
         if let encoded = try? encoder.encode(result), let encodedString = String(data: encoded, encoding: .utf8) {
           return encodedString
         }
