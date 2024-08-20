@@ -5,9 +5,9 @@ let package = Package(
     name: "SwiftJSONFormatter",
     platforms: [
       .macOS(.v10_15),
-      .iOS(.v12),
-      .tvOS(.v12),
-      .watchOS(.v5)
+      .iOS(.v13),
+      .tvOS(.v13),
+      .watchOS(.v6)
     ],
     products: [
         .library(
